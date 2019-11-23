@@ -3,24 +3,114 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:shimmer="http://schemas.android.com/apk/res-auto"
     android:background="@color/colorAccent"
-    tools:context=".Ui.Fragment.HomeFragment">
+    tools:context=".Ui.Fragment.Client.HomeFragment">
 
     <!-- TODO: Update blank fragment layout -->
-
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefreshHome"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rcyGenreHome"
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginLeft="9dp"
-            android:layout_marginRight="9dp"
-            android:descendantFocusability="blocksDescendants"></androidx.recyclerview.widget.RecyclerView>
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+            android:orientation="vertical">
 
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/shimmer_view_container"
+                android:visibility="gone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:orientation="vertical"
+                shimmer:shimmer_duration="800">
+                <!-- Adding placeholders -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="10dp">
+                        <include layout="@layout/placeholder_film_home_item" />
+                        <include layout="@layout/placeholder_film_home_item" />
+                        <include layout="@layout/placeholder_film_home_item" />
+                        <include layout="@layout/placeholder_film_home_item" />
+                        <include layout="@layout/placeholder_film_home_item" />
+                        <include layout="@layout/placeholder_film_home_item" />
+
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="10dp">
+                        <include layout="@layout/placeholder_film_home_item" />
+                        <include layout="@layout/placeholder_film_home_item" />
+                        <include layout="@layout/placeholder_film_home_item" />
+                        <include layout="@layout/placeholder_film_home_item" />
+                        <include layout="@layout/placeholder_film_home_item" />
+                        <include layout="@layout/placeholder_film_home_item" />
+
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="10dp">
+                        <include layout="@layout/placeholder_film_home_item" />
+                        <include layout="@layout/placeholder_film_home_item" />
+                        <include layout="@layout/placeholder_film_home_item" />
+                        <include layout="@layout/placeholder_film_home_item" />
+                        <include layout="@layout/placeholder_film_home_item" />
+                        <include layout="@layout/placeholder_film_home_item" />
+
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="10dp">
+                        <include layout="@layout/placeholder_film_home_item" />
+                        <include layout="@layout/placeholder_film_home_item" />
+                        <include layout="@layout/placeholder_film_home_item" />
+                        <include layout="@layout/placeholder_film_home_item" />
+                        <include layout="@layout/placeholder_film_home_item" />
+                        <include layout="@layout/placeholder_film_home_item" />
+
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="10dp">
+                        <include layout="@layout/placeholder_film_home_item" />
+                        <include layout="@layout/placeholder_film_home_item" />
+                        <include layout="@layout/placeholder_film_home_item" />
+                        <include layout="@layout/placeholder_film_home_item" />
+                        <include layout="@layout/placeholder_film_home_item" />
+                        <include layout="@layout/placeholder_film_home_item" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+            </com.facebook.shimmer.ShimmerFrameLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rcyGenreHome"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="9dp"
+                android:layout_marginRight="9dp"
+                android:descendantFocusability="blocksDescendants"/>
+
+        </LinearLayout>
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 
 </FrameLayout>

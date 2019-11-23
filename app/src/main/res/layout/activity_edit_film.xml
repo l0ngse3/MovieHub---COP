@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="match_parent"
+    android:background="@color/colorAccent"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="7dp"
+            android:background="@null"
+            android:scaleType="fitXY"
+            android:src="@drawable/ic_arrow_back" />
+
+        <TextView
+            android:id="@+id/txtTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="12dp"
+            android:layout_toRightOf="@id/btnBack"
+            android:fontFamily="@font/audiowide"
+            android:text="Edit film"
+            android:textColor="#fff"
+            android:textSize="20sp"
+            />
+
+        <TextView
+            android:id="@+id/txtSaveFilm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="10dp"
+            android:fontFamily="@font/audiowide"
+            android:text="Save"
+            android:textColor="#fff"
+            android:padding="5dp"
+            android:background="@drawable/button_outline"
+            android:visibility="gone"
+            android:textSize="18sp"
+            android:layout_alignParentRight="true" />
+
+        <ProgressBar
+            android:id="@+id/progress_horizontal"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:visibility="gone"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="20dp"
+            android:layout_alignParentRight="true"
+            android:indeterminateTint="@color/placeholder_bg" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_alignParentBottom="true"
+            android:background="@color/placeholder_bg"/>
+
+    </RelativeLayout>
+
+    <ScrollView
+        android:id="@+id/layoutScroll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="10dp"
+            android:paddingTop="5dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/audiowide"
+                android:text="Film title"
+                android:textColor="#fff"
+                android:textSize="20sp" />
+
+            <EditText
+                android:id="@+id/edtFilmTitle"
+                android:hint="Film title text here"
+                android:textSize="20sp"
+                android:textColorHint="#fff"
+                android:textColor="#fff"
+                android:textCursorDrawable="@drawable/color_white_cursor"
+                android:maxLines="2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:layout_marginTop="20dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/audiowide"
+                android:text="Film genre"
+                android:textColor="#fff"
+                android:textSize="20sp" />
+
+            <Spinner
+                android:id="@+id/spinnerGenre"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:layout_marginTop="20dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/audiowide"
+                android:text="Film thumbnail"
+                android:textColor="#fff"
+                android:textSize="20sp" />
+
+            <ImageView
+                android:id="@+id/imgThumbnail"
+                android:layout_width="@dimen/placeholder_image_width"
+                android:layout_height="@dimen/placeholder_image_height"
+                android:background="@color/placeholder_bg"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_marginTop="20dp"
+                    android:layout_width="128dp"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/audiowide"
+                    android:text="Film trailer"
+                    android:textColor="#fff"
+                    android:textSize="20sp" />
+
+                <Button
+                    android:id="@+id/btnTrailerBrow"
+                    android:layout_width="60dp"
+                    android:layout_height="20dp"
+                    android:background="@drawable/btn_trailer_film"
+                    android:text="Browser"
+                    android:layout_marginLeft="20dp"
+                    android:textAllCaps="false"
+                    android:textColor="#fff"
+                    android:layout_marginTop="15dp"
+                    android:textSize="15sp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="250dp"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:visibility="visible"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/txtPlayMode">
+                <VideoView
+                    android:id="@+id/videoViewTrailer"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_marginTop="20dp"
+                    android:layout_width="128dp"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/audiowide"
+                    android:text="Film play"
+                    android:textColor="#fff"
+                    android:textSize="20sp" />
+
+                <Button
+                    android:id="@+id/btnFilmBrow"
+                    android:layout_width="60dp"
+                    android:layout_height="20dp"
+                    android:background="@drawable/btn_trailer_film"
+                    android:text="Browser"
+                    android:layout_marginLeft="20dp"
+                    android:textAllCaps="false"
+                    android:textColor="#fff"
+                    android:layout_marginTop="15dp"
+                    android:textSize="15sp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="250dp"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:visibility="visible"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/txtPlayMode">
+                <VideoView
+                    android:id="@+id/videoViewFilm"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/audiowide"
+                android:text="Film Description"
+                android:textColor="#fff"
+                android:layout_marginTop="20dp"
+                android:textSize="20sp" />
+
+            <EditText
+                android:id="@+id/edtFilmDescription"
+                android:hint="Film Description text here"
+                android:textSize="20sp"
+                android:textColorHint="#fff"
+                android:textColor="#fff"
+                android:textCursorDrawable="@drawable/color_white_cursor"
+                android:maxLines="4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/audiowide"
+                android:text="IMDB"
+                android:textColor="#fff"
+                android:layout_marginTop="10dp"
+                android:textSize="20sp" />
+
+            <EditText
+                android:id="@+id/edtIMDB"
+                android:hint="Film ImDB"
+                android:textSize="20sp"
+                android:inputType="number"
+                android:layout_marginTop="10dp"
+                android:textColorHint="#fff"
+                android:textColor="#fff"
+                android:textCursorDrawable="@drawable/color_white_cursor"
+                android:maxLines="4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/audiowide"
+                android:text="Views"
+                android:textColor="#fff"
+                android:layout_marginTop="10dp"
+                android:textSize="20sp" />
+
+            <EditText
+                android:id="@+id/edtViews"
+                android:hint="Film views"
+                android:textSize="20sp"
+                android:inputType="number"
+                android:layout_marginTop="10dp"
+                android:textColorHint="#fff"
+                android:textColor="#fff"
+                android:textCursorDrawable="@drawable/color_white_cursor"
+                android:maxLines="4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Ui.Activity.HomePageActivity">
+    android:background="@color/colorAccent"
+    tools:context=".Ui.Activity.Client.HomePageActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/topbarLayout"
@@ -62,6 +63,7 @@
         android:layout_marginTop="?attr/actionBarSize"
         android:layout_marginBottom="?attr/actionBarSize"
         android:paddingTop="1dp"
+        android:background="@color/colorAccent"
         app:layout_constraintBottom_toTopOf="@id/bottom_nav"
         app:layout_constraintTop_toBottomOf="@id/topbarLayout"
         app:layout_constraintVertical_bias="0.0"

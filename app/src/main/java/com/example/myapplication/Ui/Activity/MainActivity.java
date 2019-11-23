@@ -1,20 +1,16 @@
 package com.example.myapplication.Ui.Activity;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
-
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import com.example.myapplication.Model.Account;
 import com.example.myapplication.Model.ShareViewModel;
 import com.example.myapplication.R;
 import com.example.myapplication.Service.ClientService;
@@ -64,12 +60,12 @@ public class MainActivity extends AppCompatActivity {
                     txtPassword.setError("Password required");
                 } else {
                     if (checkBoxRememberMe.isChecked()) {
-                        saveRemmemberMe(username, password);
+                        saveRememberMe(username, password);
                     }
                     else {
-                        saveRemmemberMe("", "");
+                        saveRememberMe("", "");
                     }
-                    ClientService service = new ClientService();
+                    ClientService service = new ClientService(context);
                     service.postLogin(username, password, context);
                 }
             }
@@ -115,8 +111,12 @@ public class MainActivity extends AppCompatActivity {
                 else if (!password.equals(passwordConfirm)) {
                     txtConfirmPassword.setError("Password not matched");
                 } else {
-                    ClientService service =  new ClientService();
-                    service.postRegister(username, password, context);
+                    ClientService service =  new ClientService(context);
+                    Account account = new Account();
+                    account.setUsername(username);
+                    account.setPassword(password);
+                    account.setRole(0);
+                    service.postRegister(account, context);
                 }
             }
         });
@@ -137,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void saveRemmemberMe(String u, String p) {
+    private void saveRememberMe(String u, String p) {
         SharedPreferences preferences = this.getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString("username", u);
@@ -145,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
         editor.apply();
     }
 
-    private void checkRemmemberMe() {
+    private void checkRememberMe() {
         SharedPreferences preferences = this.getPreferences(Context.MODE_PRIVATE);
 
         if (preferences != null) {
@@ -186,9 +186,8 @@ public class MainActivity extends AppCompatActivity {
         btnBack = findViewById(R.id.btnBack);
 
 
-        checkRemmemberMe();
+        checkRememberMe();
         viewModel = ViewModelProviders.of(this).get(ShareViewModel.class);
-
         context = this;
     }
 

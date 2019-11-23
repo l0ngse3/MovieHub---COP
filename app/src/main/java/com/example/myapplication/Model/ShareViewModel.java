@@ -13,7 +13,7 @@ import java.util.List;
 public class ShareViewModel extends AndroidViewModel {
     private MutableLiveData<String> username = new MutableLiveData<>();
     private MutableLiveData<String> profile = new MutableLiveData<>();
-    private MutableLiveData<List<Film>> allFilmList = new MutableLiveData<>();
+    private MutableLiveData<List<Genre>> allFilmInGenre = new MutableLiveData<>();
 
 
     public ShareViewModel(@NonNull Application application) {
@@ -38,11 +38,11 @@ public class ShareViewModel extends AndroidViewModel {
         this.profile.setValue(profile);
     }
 
-    public MutableLiveData<List<Film>> getAllFilmList() {
-        return allFilmList;
+    public MutableLiveData<List<Genre>> getAllFilmInGenre() {
+        return allFilmInGenre;
     }
 
-    public void setAllFilmList(List<Film> allFilmList) {
-        this.allFilmList.setValue(allFilmList);
+    public void setAllFilmInGenre(List<Genre> genres) {
+        this.allFilmInGenre.setValue(genres);
     }
 }
