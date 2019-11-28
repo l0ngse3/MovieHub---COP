@@ -81,8 +81,17 @@ public class HomePageActivity extends AppCompatActivity {
                 viewModel.getProfile().observe((LifecycleOwner) context, new Observer<String>() {
                     @Override
                     public void onChanged(String s) {
-                        String urlImg = APIConnectorUltils.HOST_STORAGE_IMAGE + new Gson().fromJson(s, Profile.class).getImage();
-                        BitmapUltils.loadCircleImageInto(context, urlImg, imgProfileAva);
+                        Profile p = new Gson().fromJson(s, Profile.class);
+                        if(p.getImage().equals("null"))
+                        {
+                            String urlImg = APIConnectorUltils.HOST_STORAGE_IMAGE + "saitama.png";
+                            BitmapUltils.loadCircleImageInto(context, urlImg, imgProfileAva);
+                        }
+                        else {
+                            String urlImg = APIConnectorUltils.HOST_STORAGE_IMAGE + p.getImage();
+                            BitmapUltils.loadCircleImageInto(context, urlImg, imgProfileAva);
+                        }
+
                         Log.d("Mine update image", "onChanged: Update image imgProfileAva");
                     }
                 });

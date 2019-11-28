@@ -14,7 +14,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
             <com.facebook.shimmer.ShimmerFrameLayout
                 android:id="@+id/shimmer_view_container"
@@ -47,9 +47,21 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rcyFilmSaved"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:paddingTop="10dp"
                 android:background="@color/colorAccent" />
+
+            <TextView
+                android:id="@+id/txtNoContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/audiowide"
+                android:text="No content...!"
+                android:gravity="center"
+                android:textSize="25sp"
+                android:visibility="gone"
+                android:paddingTop="100dp"
+                android:textColor="#fff"/>
 
         </LinearLayout>
 

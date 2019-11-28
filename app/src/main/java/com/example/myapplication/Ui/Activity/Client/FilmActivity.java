@@ -20,6 +20,7 @@ import android.widget.VideoView;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
+import com.android.volley.request.JsonArrayRequest;
 import com.android.volley.request.JsonObjectRequest;
 import com.android.volley.request.StringRequest;
 import com.android.volley.toolbox.Volley;
@@ -33,7 +34,12 @@ import com.example.myapplication.Model.Comment;
 import com.example.myapplication.Model.Film;
 import com.example.myapplication.Model.Profile;
 import com.example.myapplication.R;
+import com.example.myapplication.Ui.Adapter.Client.FilmHomeAdapter;
+import com.example.myapplication.Ui.Adapter.Client.FilmRecommendAdapter;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.ArrayList;
@@ -50,8 +56,10 @@ public class FilmActivity extends AppCompatActivity {
     EditText txtCmtText;
 
     List<Comment> commentList;
+    List<Film> filmRecommendList;
     CommentAdapter commentAdapter;
-    RecyclerView rcyComment;
+    FilmRecommendAdapter recommendAdapter;
+    RecyclerView rcyComment, rcyRecommend;
 
     LinearLayout layoutComment;
     ScrollView layoutScroll;
@@ -278,6 +286,48 @@ public class FilmActivity extends AppCompatActivity {
                 mediaController.hide();
             }
         });
+
+
+//        service.simplePoster(APIConnectorUltils.HOST_NAME+"Film/Recommend", film, new TaskDone() {
+//            @Override
+//            public void done(String result) {
+//                Log.e("Mine Object", result);
+//                Film[] arrFilm = new Gson().fromJson(result, Film[].class);
+//                filmRecommendList.addAll(Arrays.asList(arrFilm));
+//                recommendAdapter = new FilmRecommendAdapter(filmRecommendList, context, username);
+//                rcyRecommend.setLayoutManager(new LinearLayoutManager(context, RecyclerView.HORIZONTAL, false));
+//                rcyRecommend.setAdapter(recommendAdapter);
+//                recommendAdapter.notifyDataSetChanged();
+//            }
+//        });
+
+
+        JSONArray arr = new JSONArray();
+        JSONObject obj = null;
+        try {
+            obj = new JSONObject(new Gson().toJson(film));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        arr.put(obj);
+        JsonArrayRequest request = new JsonArrayRequest(Request.Method.POST, APIConnectorUltils.HOST_NAME+"Film/Recommend", arr,
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        Log.e("Mine recommend", "onResponse: "+response);
+                        Film[] arrFilm = new Gson().fromJson(response.toString(), Film[].class);
+                        filmRecommendList.addAll(Arrays.asList(arrFilm));
+                        recommendAdapter = new FilmRecommendAdapter(filmRecommendList, context, username);
+                        rcyRecommend.setLayoutManager(new LinearLayoutManager(context, RecyclerView.HORIZONTAL, false));
+                        rcyRecommend.setAdapter(recommendAdapter);
+                        recommendAdapter.notifyDataSetChanged();
+                    }
+                },
+                null);
+        RequestQueueUltil.getInstance(context).addToRequestQueue(request);
+
+
+
     }
 
     private void init() {
@@ -297,6 +347,7 @@ public class FilmActivity extends AppCompatActivity {
         layoutComment = findViewById(R.id.layoutComment);
         layoutScroll = findViewById(R.id.layoutScroll);
         imgSendCmt = findViewById(R.id.imgSendCmt);
+        rcyRecommend = findViewById(R.id.rcyRecommend);
         context = this;
         isLoved = false;
 
@@ -307,6 +358,7 @@ public class FilmActivity extends AppCompatActivity {
         txtRateFilm.setText("Imdb: " + film.getRate_imdb());
         txtDescriptionFilm.setText(film.getFilm_description());
         commentList = new ArrayList<>();
+        filmRecommendList = new ArrayList<>();
         service = new ClientService(context);
 
         BitmapUltils.loadRectangleImageInto(this,
@@ -329,7 +381,6 @@ public class FilmActivity extends AppCompatActivity {
                 }
             }
         });
-
 
     }
 

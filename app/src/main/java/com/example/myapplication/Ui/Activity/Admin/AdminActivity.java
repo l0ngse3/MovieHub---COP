@@ -5,8 +5,10 @@ import android.os.Bundle;
 
 import com.example.myapplication.R;
 import com.example.myapplication.Ui.Activity.MainActivity;
+import com.example.myapplication.Ui.Fragment.Admin.ManageAccountFragment;
 import com.example.myapplication.Ui.Fragment.Admin.ManageCommentFragment;
 import com.example.myapplication.Ui.Fragment.Admin.ManageFilmFragment;
+import com.example.myapplication.Ui.Fragment.Admin.StatisticFragment;
 import com.example.myapplication.Ui.Fragment.Client.HomeFragment;
 import com.example.myapplication.Ui.Fragment.Client.ProfileFragment;
 import com.example.myapplication.Ui.Fragment.Client.SavedFragment;
@@ -85,7 +87,7 @@ public class AdminActivity extends AppCompatActivity
                 navigationView.setCheckedItem(R.id.nav_comments);
                 break;
             case R.id.nav_accounts:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_admin, new ProfileFragment()).addToBackStack(null).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_admin, new ManageAccountFragment()).addToBackStack(null).commit();
                 toolbar.setTitle("Management Accounts");
                 navigationView.setCheckedItem(R.id.nav_accounts);
                 break;
@@ -97,8 +99,9 @@ public class AdminActivity extends AppCompatActivity
             case R.id.nav_settings:
                 getSupportFragmentManager()
                         .beginTransaction()
-                        .replace(R.id.fragment_container_admin, new ProfileFragment())
+                        .replace(R.id.fragment_container_admin, new StatisticFragment())
                         .addToBackStack(null).commit();
+                toolbar.setTitle("Statistic");
                 navigationView.setCheckedItem(R.id.nav_settings);
                 break;
 

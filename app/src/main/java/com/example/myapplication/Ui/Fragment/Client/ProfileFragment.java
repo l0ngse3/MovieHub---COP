@@ -46,7 +46,7 @@ public class ProfileFragment extends Fragment{
 
     ImageView imgAva, imgChangeProfile;
     TextView txtUser;
-    TextView txtFullname;
+    TextView txtFullname, txtNoContent;
     ShareViewModel viewModel; //view model to get username
     ShimmerFrameLayout mShimmerViewContainer;
 
@@ -182,6 +182,8 @@ public class ProfileFragment extends Fragment{
         txtUser = view.findViewById(R.id.txtUser);
         rcyFilmWatched = view.findViewById(R.id.rcyFilmWatched);
         imgChangeProfile = view.findViewById(R.id.imgChangeProfile);
+        txtNoContent = view.findViewById(R.id.txtNoContent);
+        txtNoContent.setVisibility(View.GONE);
         mShimmerViewContainer = view.findViewById(R.id.shimmer_view_container);
         mShimmerViewContainer.setVisibility(View.VISIBLE);
         mShimmerViewContainer.startShimmer();
@@ -191,7 +193,9 @@ public class ProfileFragment extends Fragment{
         fragment = this;
         this.view = view;
         listFilm = new ArrayList<>();
+        listFilm.clear();
         listIdFilm = new ArrayList<>();
+        listIdFilm.clear();
         listFilmWatched = new ArrayList<>();
         requestQueueUltil = RequestQueueUltil.getInstance(context);
         service = new ClientService(context);
@@ -211,8 +215,16 @@ public class ProfileFragment extends Fragment{
             public void onChanged(String s) {
                 profile = new Gson().fromJson(s, Profile.class);
                 txtFullname.setText(profile.getFistName() + " " + profile.getLastName());
-                String urlImg = APIConnectorUltils.HOST_STORAGE_IMAGE + profile.getImage();
-                BitmapUltils.loadCircleImageInto(context, urlImg, imgAva);
+
+                if(profile.getImage().equals("null"))
+                {
+                    String urlImg = APIConnectorUltils.HOST_STORAGE_IMAGE + "saitama.png";
+                    BitmapUltils.loadCircleImageInto(context, urlImg, imgAva);
+                }
+                else {
+                    String urlImg = APIConnectorUltils.HOST_STORAGE_IMAGE + profile.getImage();
+                    BitmapUltils.loadCircleImageInto(context, urlImg, imgAva);
+                }
 
                 Log.d("Mine update image", "onChanged: Update image imgAva");
             }
@@ -251,7 +263,15 @@ public class ProfileFragment extends Fragment{
                     listIdFilm.add(filmWatcheds[i].getIdFilm());
                     listFilmWatched.add(filmWatcheds[i]);
                 }
-                loadInforOfFilmById();
+                if(listIdFilm.size()>0){
+                    loadInforOfFilmById();
+                }
+                else {
+                    mShimmerViewContainer.stopShimmer();
+                    mShimmerViewContainer.setVisibility(View.GONE);
+                    txtNoContent.setVisibility(View.VISIBLE);
+                }
+
             }
         });
     }
@@ -265,21 +285,24 @@ public class ProfileFragment extends Fragment{
                     Film film = null;
                     film = new Gson().fromJson(result, Film.class);
                     listFilm.add(film);
-                    count++;
+//                    Log.e("Mine listFilm", "done: "+listFilm.size() );
                     if(adapter == null)
                     {
+                        count++;
                         adapter = new FilmProfileAdapter(listFilm, listFilmWatched, fragment);
                         rcyFilmWatched.setAdapter(adapter);
                         rcyFilmWatched.setLayoutManager(new GridLayoutManager(getContext(), 3));
                     }
                     else {
                         adapter.notifyItemInserted(listFilm.size());
-                        if (count == listIdFilm.size()) {
-                            mShimmerViewContainer.stopShimmer();
-                            mShimmerViewContainer.setVisibility(View.GONE);
-                            count = 0;
-                            Log.d("Mine films", count + "");
-                        }
+                        count++;
+                    }
+
+                    if (count == listIdFilm.size()) {
+                        mShimmerViewContainer.stopShimmer();
+                        mShimmerViewContainer.setVisibility(View.GONE);
+                        count = 0;
+//                        Log.d("Mine films", count + "");
                     }
                 }
             });

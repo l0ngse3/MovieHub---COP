@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="statistic_array">
+        <item>The most film loved</item>
+        <item>The most genres loved</item>
+        <item>The most genres view</item>
+        <item>Account watched the most</item>
+    </string-array>
+</resources>

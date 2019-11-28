@@ -27,13 +27,16 @@ import com.android.volley.error.AuthFailureError;
 import com.android.volley.error.VolleyError;
 import com.android.volley.request.StringRequest;
 import com.example.myapplication.Model.APIConnectorUltils;
+import com.example.myapplication.Model.Comment;
 import com.example.myapplication.Model.Film;
 import com.example.myapplication.Model.Genre;
 import com.example.myapplication.Model.ShareViewModel;
 import com.example.myapplication.R;
+import com.example.myapplication.Service.AdminService;
+import com.example.myapplication.Service.ClientService;
 import com.example.myapplication.Service.RequestQueueUltil;
-import com.example.myapplication.Ui.Adapter.Admin.ManageCommentAdapter;
-import com.example.myapplication.Ui.Adapter.Admin.ManageFilmAdapter;
+import com.example.myapplication.Service.TaskDone;
+import com.example.myapplication.Ui.Adapter.Admin.ManageFilmCommentAdapter;
 import com.facebook.shimmer.ShimmerFrameLayout;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -43,6 +46,8 @@ import org.json.JSONObject;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,19 +56,20 @@ import java.util.Map;
 public class ManageCommentFragment extends Fragment {
 
     private RecyclerView rcyAdminFilm;
-    private Spinner spinner;
+    private Spinner spinner, spinnerOrder;
     private Context context;
     private ManageCommentFragment fragment;
-    private ManageCommentAdapter manageCommentAdapter;
+    private ManageFilmCommentAdapter manageCommentAdapter;
     private ShimmerFrameLayout mShimmerViewContainer;
     RequestQueueUltil requestQueueUltil;
     SwipeRefreshLayout swipeRefreshHome;
     View viewHome;
-    ImageView btnUploadFilm;
 
     private List<Genre> genreList;
     private List<Film> filmList;
     private ShareViewModel viewModel;
+    ClientService service;
+
 
     public ManageCommentFragment() {
         // Required empty public constructor
@@ -99,6 +105,7 @@ public class ManageCommentFragment extends Fragment {
     private void init(View view) {
         context = view.getContext();
         spinner = view.findViewById(R.id.spinnerGenre);
+        spinnerOrder = view.findViewById(R.id.spinnerOrder);
         rcyAdminFilm = view.findViewById(R.id.listAdminFilm);
         rcyAdminFilm.setVisibility(View.GONE);
         mShimmerViewContainer = view.findViewById(R.id.shimmer_view_container);
@@ -112,11 +119,17 @@ public class ManageCommentFragment extends Fragment {
         filmList = new ArrayList<>();
         requestQueueUltil = RequestQueueUltil.getInstance(getContext());
         viewHome = view;
+        service = new ClientService(context);
 
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(view.getContext(),
                 R.array.genres_array, R.layout.spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
+
+        ArrayAdapter<CharSequence> adapterOrder = ArrayAdapter.createFromResource(view.getContext(),
+                R.array.order_by_comment, R.layout.spinner_item);
+        adapterOrder.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerOrder.setAdapter(adapterOrder);
 
         //////////////////////////////////////GET DATA////////////////////////////////
         final List<String> genreListRequest = new ArrayList<>();
@@ -131,12 +144,12 @@ public class ManageCommentFragment extends Fragment {
 
         for (final String genre : genreListRequest)
         {
-            String url = APIConnectorUltils.HOST_STORAGE_FILM + "Genre/";
+            String url = APIConnectorUltils.HOST_NAME + "Comment/GetCommentFilm";
             Log.d("Mine films", url);
             StringRequest request = new StringRequest(Request.Method.POST, url,
                     new Response.Listener<String>() {
                         @Override
-                        public void onResponse(String response) {
+                        public void onResponse(final String response) {
                             Genre gen = new Genre();
                             try {
 
@@ -146,19 +159,17 @@ public class ManageCommentFragment extends Fragment {
                                 Type type = new TypeToken<List<Film>>() {
                                 }.getType();
                                 gen.setList((List<Film>) new Gson().fromJson(object.getString("list"), type));
-
                                 if (gen.getList().size() > 0) {
                                     genreList.add(gen);
                                     filmList.addAll(gen.getList());
+
                                     if (manageCommentAdapter == null) {
-                                        Log.d("Mine films", "Create new");
-                                        manageCommentAdapter = new ManageCommentAdapter(filmList , fragment);
+//                                        Log.d("Mine films", "Create new");
+                                        manageCommentAdapter = new ManageFilmCommentAdapter(filmList , fragment);
                                         rcyAdminFilm.setLayoutManager(new LinearLayoutManager(context, RecyclerView.VERTICAL, false));
                                         rcyAdminFilm.setAdapter(manageCommentAdapter);
                                     } else {
-                                        Log.d("Mine films", "reuse");
-//                                        manageFilmAdapter.notifyItemInserted(genreList.size());
-//                                        manageFilmAdapter.addFilm(gen.getList());
+//                                        Log.d("Mine films", "reuse");
                                         manageCommentAdapter.notifyDataSetChanged();
 
                                         mShimmerViewContainer.stopShimmer();
@@ -221,6 +232,17 @@ public class ManageCommentFragment extends Fragment {
                         }
                     }
                 }
+
+                String curSortMode = spinnerOrder.getSelectedItem().toString();
+                if (curSortMode.equals("A to Z")){
+                    Collections.sort(filmList,new SortByView());
+                    manageCommentAdapter.notifyDataSetChanged();
+                }
+                else if(curSortMode.equals("Z to A")){
+                    Collections.sort(filmList,new SortByView());
+                    Collections.reverse(filmList);
+                    manageCommentAdapter.notifyDataSetChanged();
+                }
             }
 
             @Override
@@ -228,6 +250,102 @@ public class ManageCommentFragment extends Fragment {
 
             }
         });
+
+        /////////// sort by comment ///////////////////
+        spinnerOrder.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                String selectedItem = adapterView.getItemAtPosition(i).toString();
+                String curGenre = spinner.getSelectedItem().toString();
+                if(selectedItem.equals("Sort By View"))
+                {
+                    if(manageCommentAdapter != null){
+                        filmList.clear();
+                        if(curGenre.equals("All genres")){
+                            for (Genre g : genreList)
+                            {
+                                filmList.addAll(g.getList());
+                                manageCommentAdapter.notifyDataSetChanged();
+                            }
+                        }
+                        else {
+                            for(Genre g : genreList)
+                            {
+                                if(g.getNameGenre().equals(curGenre))
+                                {
+                                    filmList.addAll(g.getList());
+                                    manageCommentAdapter.notifyDataSetChanged();
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                else if(selectedItem.equals("A to Z")) {
+                    filmList.clear();
+                    if(curGenre.equals("All genres")){
+                        for (Genre g : genreList)
+                        {
+                            filmList.addAll(g.getList());
+                            Collections.sort(filmList,new SortByView());
+                            manageCommentAdapter.notifyDataSetChanged();
+                        }
+                    }
+                    else {
+                        for(Genre g : genreList)
+                        {
+                            if(g.getNameGenre().equals(curGenre))
+                            {
+                                filmList.addAll(g.getList());
+                                Collections.sort(filmList,new SortByView());
+                                manageCommentAdapter.notifyDataSetChanged();
+                                break;
+                            }
+                        }
+                    }
+                }
+                else if(selectedItem.equals("Z to A")) {
+                    filmList.clear();
+                    if(curGenre.equals("All genres")){
+                        for (Genre g : genreList)
+                        {
+                            filmList.addAll(g.getList());
+                            Collections.sort(filmList,new SortByView());
+                            Collections.reverse(filmList);
+                            manageCommentAdapter.notifyDataSetChanged();
+                        }
+                    }
+                    else {
+                        for(Genre g : genreList)
+                        {
+                            if(g.getNameGenre().equals(curGenre))
+                            {
+                                filmList.addAll(g.getList());
+                                Collections.sort(filmList,new SortByView());
+                                Collections.reverse(filmList);
+                                manageCommentAdapter.notifyDataSetChanged();
+                                break;
+                            }
+                        }
+                    }
+                }
+                ////////end sort
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+    }
+
+    private class SortByView implements Comparator<Film> {
+        @Override
+        public int compare(Film film, Film t1) {
+            int f1 = Integer.parseInt(film.getFilm_views());
+            int f2 = Integer.parseInt(t1.getFilm_views());
+            return f1 - f2;
+        }
     }
 
     ////////////////////////////////

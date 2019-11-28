@@ -161,6 +161,18 @@
 
             </com.facebook.shimmer.ShimmerFrameLayout>
 
+            <TextView
+                android:id="@+id/txtNoContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/audiowide"
+                android:text="No content...!"
+                android:gravity="center"
+                android:textSize="25sp"
+                android:visibility="gone"
+                android:paddingTop="100dp"
+                android:textColor="#fff"/>
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rcyFilmWatched"
                 android:layout_width="match_parent"

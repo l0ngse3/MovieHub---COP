@@ -43,6 +43,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +53,7 @@ import java.util.Map;
 public class ManageFilmFragment extends Fragment {
 
     private RecyclerView rcyAdminFilm;
-    private Spinner spinner;
+    private Spinner spinner, spinnerOrder;
     private Context context;
     private ManageFilmFragment fragment;
     private ManageFilmAdapter manageFilmAdapter;
@@ -73,7 +75,6 @@ public class ManageFilmFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup view, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-
         return inflater.inflate(R.layout.fragment_manage_film, view, false);
     }
 
@@ -107,6 +108,7 @@ public class ManageFilmFragment extends Fragment {
     private void init(View view) {
         context = view.getContext();
         spinner = view.findViewById(R.id.spinnerGenre);
+        spinnerOrder = view.findViewById(R.id.spinnerOrder);
         rcyAdminFilm = view.findViewById(R.id.listAdminFilm);
         rcyAdminFilm.setVisibility(View.GONE);
         mShimmerViewContainer = view.findViewById(R.id.shimmer_view_container);
@@ -126,6 +128,13 @@ public class ManageFilmFragment extends Fragment {
                 R.array.genres_array, R.layout.spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
+
+
+        ArrayAdapter<CharSequence> adapterOrderBy = ArrayAdapter.createFromResource(view.getContext(),
+                R.array.order_by_array, R.layout.spinner_item);
+        adapterOrderBy.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerOrder.setAdapter(adapterOrderBy);
+
 
         //////////////////////////////////////GET DATA////////////////////////////////
         final List<String> genreListRequest = new ArrayList<>();
@@ -230,6 +239,103 @@ public class ManageFilmFragment extends Fragment {
                         }
                     }
                 }
+
+                String curSortMode = spinnerOrder.getSelectedItem().toString();
+                if (curSortMode.equals("A to Z")){
+                    Collections.sort(filmList,new SortByView());
+                    manageFilmAdapter.notifyDataSetChanged();
+                }
+                else if(curSortMode.equals("Z to A")){
+                    Collections.sort(filmList,new SortByView());
+                    Collections.reverse(filmList);
+                    manageFilmAdapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        spinnerOrder.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                String selectedItem = adapterView.getItemAtPosition(i).toString();
+                String curGenre = spinner.getSelectedItem().toString();
+                if(selectedItem.equals("Sort By View"))
+                {
+                    if(manageFilmAdapter != null){
+                        filmList.clear();
+                        if(curGenre.equals("All genres")){
+                            for (Genre g : genreList)
+                            {
+                                filmList.addAll(g.getList());
+                                manageFilmAdapter.notifyDataSetChanged();
+                            }
+                        }
+                        else {
+                            for(Genre g : genreList)
+                            {
+                                if(g.getNameGenre().equals(curGenre))
+                                {
+                                    filmList.addAll(g.getList());
+                                    manageFilmAdapter.notifyDataSetChanged();
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                else if(selectedItem.equals("A to Z")) {
+                    filmList.clear();
+                    if(curGenre.equals("All genres")){
+                        for (Genre g : genreList)
+                        {
+                            filmList.addAll(g.getList());
+                            Collections.sort(filmList,new SortByView());
+                            manageFilmAdapter.notifyDataSetChanged();
+                        }
+                    }
+                    else {
+                        for(Genre g : genreList)
+                        {
+                            if(g.getNameGenre().equals(curGenre))
+                            {
+                                filmList.addAll(g.getList());
+                                Collections.sort(filmList,new SortByView());
+                                manageFilmAdapter.notifyDataSetChanged();
+                                break;
+                            }
+                        }
+                    }
+                }
+                else if(selectedItem.equals("Z to A")) {
+                    filmList.clear();
+                    if(curGenre.equals("All genres")){
+                        for (Genre g : genreList)
+                        {
+                            filmList.addAll(g.getList());
+                            Collections.sort(filmList,new SortByView());
+                            Collections.reverse(filmList);
+                            manageFilmAdapter.notifyDataSetChanged();
+                        }
+                    }
+                    else {
+                        for(Genre g : genreList)
+                        {
+                            if(g.getNameGenre().equals(curGenre))
+                            {
+                                filmList.addAll(g.getList());
+                                Collections.sort(filmList,new SortByView());
+                                Collections.reverse(filmList);
+                                manageFilmAdapter.notifyDataSetChanged();
+                                break;
+                            }
+                        }
+                    }
+                }
+                ////////end sort
             }
 
             @Override
@@ -239,5 +345,13 @@ public class ManageFilmFragment extends Fragment {
         });
     }
 
+    private class SortByView implements Comparator<Film>{
+        @Override
+        public int compare(Film film, Film t1) {
+            int f1 = Integer.parseInt(film.getFilm_views());
+            int f2 = Integer.parseInt(t1.getFilm_views());
+            return f1 - f2;
+        }
+    }
 
 }

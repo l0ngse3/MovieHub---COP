@@ -1,44 +1,55 @@
 package com.example.myapplication.Ui.Adapter.Admin;
 
 import android.content.Context;
-import android.content.Intent;
+import android.content.DialogInterface;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.myapplication.Model.APIConnectorUltils;
+import com.example.myapplication.Model.BitmapUltils;
+import com.example.myapplication.Model.Comment;
 import com.example.myapplication.Model.Film;
+import com.example.myapplication.Model.Profile;
 import com.example.myapplication.R;
-import com.example.myapplication.Service.AdminService;
-import com.example.myapplication.Ui.Activity.Admin.EditFilmActivity;
+import com.example.myapplication.Service.ClientService;
+import com.example.myapplication.Service.TaskDone;
+import com.example.myapplication.Ui.Activity.Admin.ManageCommentActivity;
 import com.google.gson.Gson;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class ManageCommentAdapter extends RecyclerView.Adapter<ManageCommentAdapter.ViewHolder> {
+public class ManageCommentAdapter extends RecyclerView.Adapter<ManageCommentAdapter.ViewHolder> implements Filterable {
+    private List<Comment> list, fullist;
+    private ManageCommentActivity context;
 
-    private List<Film> list;
-    private Fragment fragment;
+    private Profile profile;
+    private Comment comment;
+    private ClientService service;
+    private ManageCommentAdapter adapter;
 
-    Film recentlyFilm;
-    String username;
-    AdminService service;
-    /////////////////////////////////////////////////////
-
-    public ManageCommentAdapter(List<Film> list, Fragment fragment) {
+    public ManageCommentAdapter(List<Comment> list, ManageCommentActivity context) {
         this.list = list;
-        this.fragment = fragment;
-        service = new AdminService(fragment.getContext());
+        this.context = context;
+        service = new ClientService(context);
+        adapter = this;
+        fullist = new ArrayList<>(list);
     }
 
     @NonNull
@@ -46,14 +57,15 @@ public class ManageCommentAdapter extends RecyclerView.Adapter<ManageCommentAdap
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
-        View view = inflater.inflate(R.layout.list_item_film_saved, parent, false);
-        return new ViewHolder(view);
+        View view = inflater.inflate(R.layout.list_item_comment_manage, parent, false);
+        ViewHolder viewHolder = new ViewHolder(view);
+        return viewHolder;
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Film film = list.get(position);
-        holder.onBind(film, position);
+        comment = list.get(position);
+        holder.onBind(comment, position);
     }
 
     @Override
@@ -61,59 +73,131 @@ public class ManageCommentAdapter extends RecyclerView.Adapter<ManageCommentAdap
         return list.size();
     }
 
-    public Context getContext() {
-        return fragment.getContext();
+    private void deleteItem(int position) {
+        Comment deleteCmt = list.get(position);
+        list.remove(position);
+        notifyItemRemoved(position);
+
+        String urlDeleteComment = APIConnectorUltils.HOST_STORAGE_COMMENT + "DeleteComment";
+        service.simplePoster(urlDeleteComment, deleteCmt, new TaskDone() {
+            @Override
+            public void done(String result) {
+                Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
-    /////////////////////////////////////////////////////////////////////////////////
+    @Override
+    public Filter getFilter() {
+        return commentFilter;
+    }
+
+    private Filter commentFilter = new Filter() {
+        @Override
+        protected FilterResults performFiltering(CharSequence charSequence) {
+            List<Comment> filterList = new ArrayList<>();
+
+            if(charSequence.length()==0 || charSequence==null)
+            {
+                filterList.addAll(fullist);
+            }
+            else {
+                String filterPattern = charSequence.toString().toLowerCase().trim();
+
+                for (Comment item : fullist)
+                {
+                    if(item.getContent().toLowerCase().contains(filterPattern))
+                    {
+                        filterList.add(item);
+                    }
+                }
+            }
+
+            FilterResults results = new FilterResults();
+            results.values = filterList;
+
+            return results;
+        }
+
+        @Override
+        protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+            list.clear();
+            list.addAll( (List) filterResults.values);
+            notifyDataSetChanged();
+        }
+    };
+
+
     public class ViewHolder extends RecyclerView.ViewHolder {
-        ImageView imgSaved, imgDelete;
-        TextView txtDurationSaved, txtTitleSaved, txtDescriptionSaved, txtViewSaved;
-        ProgressBar progressFilmWatched;
-        Film film;
+
+        ImageView imgAvaCmt, imgMoreAction;
+        TextView txtFullnameCmt, txtContentCmt;
+        Comment comment;
         int position;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            imgSaved = itemView.findViewById(R.id.imgSaved);
-            txtDurationSaved = itemView.findViewById(R.id.txtDurationSaved);
-            txtTitleSaved = itemView.findViewById(R.id.txtTitleSaved);
-            txtDescriptionSaved = itemView.findViewById(R.id.txtDescriptionSaved);
-            txtViewSaved = itemView.findViewById(R.id.txtViewSaved);
-            progressFilmWatched = itemView.findViewById(R.id.progressFilmWatchedProfile);
-            imgDelete = itemView.findViewById(R.id.imgDelete);
-
-            txtDurationSaved.setVisibility(View.GONE);
+            imgAvaCmt = itemView.findViewById(R.id.imgAvaCmt);
+            txtContentCmt = itemView.findViewById(R.id.txtContentCmt);
+            txtFullnameCmt = itemView.findViewById(R.id.txtFullnameCmt);
+            imgMoreAction = itemView.findViewById(R.id.imgMoreAction);
         }
 
-
-        public void onBind(Film f, int pos){
-            film = f;
+        public void onBind(Comment c, int pos)
+        {
+            comment = c;
             position = pos;
-            Glide.with(fragment).load(APIConnectorUltils.HOST_STORAGE + f.getThumbnail())
-                    .centerCrop()
-                    .apply(new RequestOptions().override(128, 72))
-                    .diskCacheStrategy(DiskCacheStrategy.NONE)
-                    .skipMemoryCache(true)
-                    .into(imgSaved);
-
-
-            txtDescriptionSaved.setText("Imdb: " + f.getRate_imdb());
-            txtViewSaved.setText(f.getFilm_views() + " views");
-            txtTitleSaved.setText(f.getTitle_film());
-            username = fragment.getActivity().getIntent().getStringExtra("username");
-            recentlyFilm = new Film();
-
-            itemView.setOnClickListener(new View.OnClickListener() {
+            service.getInfoProfile(comment.getUsername(), new TaskDone() {
                 @Override
-                public void onClick(View view) {
-                    Intent intent = new Intent(fragment.getActivity(), EditFilmActivity.class);
-                    intent.putExtra("film", new Gson().toJson(film));
-                    fragment.getActivity().startActivity(intent);
+                public void done(String result) {
+                    profile = new Gson().fromJson(result, Profile.class);
+                    if(context!=null)
+                    {
+                        String imgUrl;
+                        if(profile.getImage().equals("null"))
+                        {
+                            imgUrl = APIConnectorUltils.HOST_STORAGE_IMAGE+"saitama.png";
+                        }
+                        else {
+                            imgUrl = APIConnectorUltils.HOST_STORAGE_IMAGE + profile.getImage();
+                        }
+                        Glide.with(context).load(imgUrl)
+                                .centerCrop()
+                                .apply(new RequestOptions().circleCrop())
+                                .into(imgAvaCmt);
+                    }
+                    txtFullnameCmt.setText(profile.getFistName()+" "+profile.getLastName());
                 }
             });
 
+            txtContentCmt.setText(comment.getContent());
+
+
+            imgMoreAction.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setTitle("Delete comment!");
+                    builder.setMessage("Do you want to delete this comment?");
+                    builder.setCancelable(false);
+                    builder.setPositiveButton("Yes, delete it!", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            adapter.deleteItem(position);
+                        }
+                    });
+                    builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                        }
+                    });
+                    AlertDialog alertDialog = builder.create();
+                    alertDialog.show();
+                }
+            });
         }
     }
+///////////////////////////////////
 
 }

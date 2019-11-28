@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Response;
@@ -42,6 +43,7 @@ public class SavedFragment extends Fragment {
     RecyclerView rcyFilmSaved;
     List<Film> filmList;
     FilmSavedAdapter adapter;
+    TextView txtNoContent;
 
     ShareViewModel viewModel;
     Fragment fragment;
@@ -85,6 +87,8 @@ public class SavedFragment extends Fragment {
         viewSaved = view;
         swipeRefreshSaved = view.findViewById(R.id.swipeRefreshSaved);
         rcyFilmSaved = view.findViewById(R.id.rcyFilmSaved);
+        txtNoContent = view.findViewById(R.id.txtNoContent);
+        txtNoContent.setVisibility(View.GONE);
         mShimmerViewContainer = view.findViewById(R.id.shimmer_view_container);
         mShimmerViewContainer.setVisibility(View.VISIBLE);
         mShimmerViewContainer.startShimmer();
@@ -116,6 +120,13 @@ public class SavedFragment extends Fragment {
                 }
                 mShimmerViewContainer.stopShimmer();
                 mShimmerViewContainer.setVisibility(View.GONE);
+
+                if(filmList.size()==0){
+                    txtNoContent.setVisibility(View.VISIBLE);
+                }
+                else {
+                    txtNoContent.setVisibility(View.GONE);
+                }
 
                 Log.d("Mine Film saved", result);
             }

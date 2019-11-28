@@ -48,8 +48,10 @@ public class ClientService {
     //simple poster
     public void simplePoster(String url, Object json_data, final TaskDone taskDone)
     {
+//        Log.e("Mine Object", "init: "+json_data.toString());
         try {
             JSONObject object = new JSONObject(new Gson().toJson(json_data));
+            Log.e("Mine Object", "init: "+object.toString());
             JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, object,
                     new Response.Listener<JSONObject>() {
                         @Override

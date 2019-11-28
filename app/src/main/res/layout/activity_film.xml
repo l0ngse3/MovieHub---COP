@@ -52,6 +52,28 @@
                     android:layout_height="match_parent" />
             </LinearLayout>
 
+            <LinearLayout
+                android:layout_marginTop="20dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_marginLeft="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Recommend"
+                    android:textColor="#fff"
+                    android:fontFamily="@font/audiowide"
+                    android:textSize="20sp"/>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rcyRecommend"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
+
             <TextView
                 android:id="@+id/txtCommentView"
                 android:layout_width="wrap_content"

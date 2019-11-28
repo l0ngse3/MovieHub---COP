@@ -13,16 +13,13 @@ public class Account {
     @SerializedName("role")
     @Expose
     private int role;
-    @SerializedName("name")
-    @Expose
-    private String name;
 
-    public Account(String username, String password, int role, String name) {
+
+    public Account(String username, String password, int role) {
         super();
         this.username = username;
         this.password = password;
         this.role = role;
-        this.name = name;
     }
 
     public Account() {
@@ -58,16 +55,5 @@ public class Account {
     public void setRole(int role) {
         this.role = role;
     }
-
-
-    public String getName() {
-        return name;
-    }
-
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
 
 }
